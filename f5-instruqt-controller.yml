@@ -10,8 +10,7 @@
   vars:
     username: admin
     admin_password: SkyWalk1!
-    aap_host: "https://attila.thenorvilles.com"
-    # aap_host: https://localhost
+    aap_host: "https://localhost"
     # lab_credential_name: "Lab Machine Credential"
     # lab_project_name: "Lab Project"
     # lab_jt_name: "Debug-Info"
