@@ -9,18 +9,20 @@
 
   vars:
     username: admin
-    admin_password: ansible123!
-    #lab_credential_name: "Lab Machine Credential"
-    #lab_project_name: "Lab Project"
-    #lab_jt_name: "Debug-Info"
-    #lab_inventory_name: "Lab-Inventory"
-    #lab_organization: "Default"
-    #lab_hosts:
+    admin_password: SkyWalk1!
+    aap_host: "https://attila.thenorvilles.com"
+    # aap_host: https://localhost
+    # lab_credential_name: "Lab Machine Credential"
+    # lab_project_name: "Lab Project"
+    # lab_jt_name: "Debug-Info"
+    # lab_inventory_name: "Lab-Inventory"
+    # lab_organization: "Default"
+    # lab_hosts:
     #   - host01
     #   - host02
     # lab_inv_group_name: "web"
-    # custom_facts_dir: "/etc/ansible/facts.d"
-    # custom_facts_file: custom_facts.fact
+    custom_facts_dir: "/etc/ansible/facts.d"
+    custom_facts_file: custom_facts.fact
 
   tags:
     - f5-101
@@ -28,7 +30,7 @@
   tasks:
     - name: Ensure AAP Controller is online and working
       ansible.builtin.uri:
-        url: https://localhost/api/v2/ping/
+        url: "{{ aap_host }}/api/v2/ping/"
         method: GET
         user: "{{ username }}"
         password: "{{ admin_password }}"
@@ -40,78 +42,84 @@
       retries: 5
       tags:
         - setup-env
-  #  # Create awx login token and custom fact
-  #   - name: get awx token and restart automation-controller if it fails
-  #     block:
-  #       - name: Gather facts
-  #         setup:
-  #         tags:
-  #           - awx-token
-  #       - name: login awx token
-  #         shell: >
-  #           awx --conf.username admin --conf.password "ansible123!" -k login | jq -r '.token'
-  #         register: awx_token
-  #         until: awx_token is success
-  #         retries: 6
-  #         delay: 3
-  #         failed_when: awx_token.rc > 0
-        
-  #     rescue:
-  #       - name: In rescue block for awx token
-  #         debug:
-  #           msg: "failed to get awx token. Restarting automation controller service"
 
-  #       - name: restart the controller service
-  #         ansible.builtin.service:
-  #           name: automation-controller
-  #           state: restarted
+    - name: Dump out the results
+      ansible.builtin.debug:
+        var: controller_online
 
-  #       - name: Ensure tower/controller is online and working
-  #         uri:
-  #           url: https://localhost/api/v2/ping/
-  #           method: GET
-  #           user: "{{ username }}"
-  #           password: "{{ admin_password }}"
-  #           validate_certs: false
-  #           force_basic_auth: true
-  #         register: controller_online
-  #         until: controller_online is success
-  #         delay: 3
-  #         retries: 5
+   # Create awx login token and custom fact
+    - name: get awx token and restart automation-controller if it fails
+      block:
+        - name: Gather facts
+          ansible.builtin.setup:
+          tags:
+            - awx-token
 
-  #       - name: Retry getting awx token
-  #         shell: >
-  #           awx --conf.username admin --conf.password "ansible123!" -k login | jq -r '.token'
-  #         register: awx_token
-  #         until: awx_token is not failed
-  #         retries: 6
-  #         delay: 3
+        - name: login awx token
+          ansible.builtin.shell: >
+            awx --conf.username admin --conf.password "ansible123!" -k login | jq -r '.token'
+          register: awx_token
+          until: awx_token is success
+          retries: 6
+          delay: 3
+          failed_when: awx_token.rc > 0
 
-  #     always:
-  #       - name: Create fact.d dir
-  #         file:
-  #           path: "{{ custom_facts_dir }}"
-  #           state: directory
-  #           recurse: yes
-        
-  #       - name: Create awx-token custom fact
-  #         copy:
-  #           content: |
-  #             [localfacts]
-  #             _awx_token = "{{ awx_token.stdout }}"
-  #           dest: "{{ custom_facts_dir }}/{{ custom_facts_file }}"
+      rescue:
+        - name: In rescue block for awx token
+          ansible.builtin.debug:
+            msg: "failed to get awx token. Restarting automation controller service"
 
-  #       - name: Refresh facts
-  #         setup:
-  #     when: ansible_local.custom_facts.localfacts._awx_token is undefined or  ansible_local.custom_facts.localfacts._awx_token | count == 0
-  #     tags:
-  #       - setup-env
-  
-  #   - name: debug custom fact
-  #     debug:
-  #       var: ansible_local.custom_facts.localfacts._awx_token 
-  #     tags:
-  #       - awx-token
+        - name: restart the controller service
+          ansible.builtin.service:
+            name: automation-controller
+            state: restarted
+
+        - name: Ensure tower/controller is online and working
+          ansible.builtin.uri:
+            url: https://localhost/api/v2/ping/
+            method: GET
+            user: "{{ username }}"
+            password: "{{ admin_password }}"
+            validate_certs: false
+            force_basic_auth: true
+          register: controller_online
+          until: controller_online is success
+          delay: 3
+          retries: 5
+
+        - name: Retry getting awx token
+          ansible.builtin.shell: >
+            awx --conf.username admin --conf.password "ansible123!" -k login | jq -r '.token'
+          register: awx_token
+          until: awx_token is not failed
+          retries: 6
+          delay: 3
+
+      always:
+        - name: Create fact.d dir
+          ansible.builtin.file:
+            path: "{{ custom_facts_dir }}"
+            state: directory
+            recurse: true
+
+        - name: Create awx-token custom fact
+          ansible.builtin.copy:
+            content: |
+              [localfacts]
+              _awx_token = "{{ awx_token.stdout }}"
+            dest: "{{ custom_facts_dir }}/{{ custom_facts_file }}"
+
+        - name: Refresh facts
+          ansible.builtin.setup:
+      when: ansible_local.custom_facts.localfacts._awx_token is undefined or  ansible_local.custom_facts.localfacts._awx_token | count == 0
+      tags:
+        - setup-env
+
+    - name: debug custom fact
+      ansible.builtin.debug:
+        var: ansible_local.custom_facts.localfacts._awx_token 
+      tags:
+        - awx-token
 
   #   # Set up the lab inventory
   #   - name: Add the {{ lab_inventory_name }} Inventory
