@@ -1,0 +1,19 @@
+---
+- name: Big-IP Setup
+  hosts: lb
+  connection: local
+  gather_facts: false
+
+  tasks: 
+
+    - name: Add nodes on the F5 Load Balancer
+      f5networks.f5_modules.bigip_node:
+        provider: 
+          server: "{{ f5_server }}"
+          user: "{{ f5_user }}"
+          password: "{{ f5_password }}"
+          server_port: 8443
+          validate_certs: false
+        host: "{{ hostvars[item].ansible_host }}"
+        name: "{{ hostvars[item].inventory_hostname }}"
+      loop: "{{ groups['web'] }}"

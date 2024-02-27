@@ -1,0 +1,8 @@
+---
+ansible-navigator:
+  execution-environment:
+    image: localhost/ee-f5:v1.2
+    pull:
+      policy: missing
+  playbook-artifact:
+    enable: false
