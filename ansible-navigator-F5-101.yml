@@ -10,3 +10,6 @@ ansible-navigator:
     image: quay.io/f5_business_development/f5_ee:latest
     pull:
       policy: missing
+    volume-mounts:
+      - dest: /tmp/f5/
+        src: /f5/code-output/
