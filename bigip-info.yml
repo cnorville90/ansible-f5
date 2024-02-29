@@ -31,3 +31,16 @@
     - name: DISPLAY ONLY THE VERSION
       debug:
         var: device_facts['system_info']['product_version']
+
+    - name: Collect F5 Big-IP Facts
+      f5networks.f5_modules.bigip_device_info:
+        gather_subset:
+          - system-info
+        provider:
+          server: "{{ f5_server }}"
+          user: "{{ f5_user }}"
+          password: "{{ password }}"
+          server_port: 8443
+          validate_certs: false
+      register: device_facts
+    

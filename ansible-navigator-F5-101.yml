@@ -1,0 +1,12 @@
+---
+ansible-navigator:
+ansible:
+   inventory:
+      entries:
+      - /home/rhel-user/lab_inventory/hosts
+execution-environment:
+   container-engine: podman
+   enabled: true
+   image: quay.io/f5_business_development/f5_ee:latest
+   pull:
+      policy: missing
