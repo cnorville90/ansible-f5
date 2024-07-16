@@ -6,8 +6,8 @@ ansible_config: ansible.cfg
 dependencies:
   galaxy: requirements.yml
 
-images: 
+images:
   base_image:
     name: registry.redhat.io/ansible-automation-platform-23/ee-minimal-rhel8:latest
   builder_image:
-    name: registry.redhat.io/ansible-automation-platform-23/ansible-builder-rhel8:latest 
+    name: registry.redhat.io/ansible-automation-platform-23/ansible-builder-rhel8:latest

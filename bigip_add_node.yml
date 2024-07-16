@@ -1,0 +1,26 @@
+---
+- name: Add a pool to the Big-IP 
+  hosts: localhost
+  gather_facts: false
+  vars_files:
+    - bigip_vars.yml
+
+  vars: 
+    pool_name: my_pool
+
+  tasks: 
+
+    - name: Create a pool on the Big-IP
+      f5networks.f5_modules.bigip_pool:
+        provider:
+          server: "{{ f5_server }}"
+          user: "{{ f5_user }}"
+          password: "{{ f5_password }}"
+          server_port: 8443
+          validate_certs: false
+          no_f5_teem: true
+        name: "{{ pool_name }}"
+        lb_method: "round-robin"
+        monitors: "/Common/http"
+        monitor_type: "and_list"
+

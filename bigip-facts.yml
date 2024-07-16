@@ -16,18 +16,10 @@
           user: "{{ f5_user }}"
           password: "{{ f5_password }}"
           server_port: 8443
-          no_f5_teem: true
           validate_certs: false
+          no_f5_teem: true
       register: device_facts
 
     - name: Display F5 Big-IP System Info
       debug: 
         var: device_facts
-
-    - name: DISPLAY ONLY THE MAC ADDRESS
-      debug:
-        var: device_facts['system_info']['base_mac_address']
-
-    - name: DISPLAY ONLY THE VERSION
-      debug:
-        var: device_facts['system_info']['product_version']
