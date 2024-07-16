@@ -8,7 +8,7 @@
 
   tasks:
 
-    - name: Add nods to the F5
+    - name: Add nodes to the F5
       f5networks.f5_modules.bigip_node:
         provider:
           server: "{{ f5_server }}"
