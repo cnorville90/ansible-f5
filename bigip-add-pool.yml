@@ -2,6 +2,9 @@
 - name: Create a Load Balancing Pool on the F5 Applicance
   hosts: localhost
   gather_facts: false
+  vars:
+    f5_user: "{{ lookup('env', 'F5_USERNAME') }}"
+    f5_password: "{{ lookup('env', 'F5_PASSWORD') }}"
 
   tasks:
 

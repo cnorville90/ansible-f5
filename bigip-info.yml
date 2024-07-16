@@ -8,10 +8,6 @@
 
   tasks:
 
-    - name: Display server
-      ansible.builtin.debug:
-        var: f5_server
-
     - name: Collect F5 Big-IP Facts
       f5networks.f5_modules.bigip_device_info:
         gather_subset:
