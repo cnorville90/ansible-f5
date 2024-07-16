@@ -2,8 +2,9 @@
 - name: Grab F5 Facts
   hosts: localhost
   gather_facts: false
-  vars_files:
-    - bigip_vars.yml
+  vars:
+    f5_user: "{{ lookup('env', 'F5_USERNAME') }}"
+    f5_password: "{{ lookup('env', 'F5_PASSWORD') }}"
 
   tasks:
 
