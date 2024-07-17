@@ -5,6 +5,7 @@
   vars:
     f5_user: "{{ lookup('env', 'F5_USERNAME') }}"
     f5_password: "{{ lookup('env', 'F5_PASSWORD') }}"
+    f5_server_port: 8443
 
   tasks:
 
@@ -14,10 +15,24 @@
           server: "{{ f5_server }}"
           user: "{{ f5_user }}"
           password: "{{ f5_password }}"
-          server_port: 8443
+          server_port: "{{ f5_server_port }}"
           validate_certs: false
           no_f5_teem: true
         name: "{{ pool_name }}"
         lb_method: "round-robin"
         monitors: "/Common/http"
         monitor_type: "and_list"
+      notify: save_running_config
+
+  handlers:
+
+    - name: save_running_config
+      f5networks.f5_modules.bigip_config:
+        provider:
+          server: "{{ f5_server }}"
+          user: "{{ f5_user }}"
+          password: "{{ f5_password }}"
+          server_port: "{{ f5_server_port }}"
+          no_f5_teem: true
+          validate_certs: false
+        save: true
