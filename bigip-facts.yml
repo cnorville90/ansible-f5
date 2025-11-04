@@ -5,6 +5,7 @@
   vars:
     f5_user: "{{ lookup('env', 'F5_USERNAME') }}"
     f5_password: "{{ lookup('env', 'F5_PASSWORD') }}"
+    f5_server: "{{ lookup('env', 'F5_HOST') }}"
 
   tasks:
 
