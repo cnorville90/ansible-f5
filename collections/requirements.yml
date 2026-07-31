@@ -1,0 +1,5 @@
+---
+collections:
+  - name: f5networks.f5_bigip
+
+
